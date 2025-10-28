@@ -1,9 +1,9 @@
-import AccountRepository from "./AccountRepository";
+import { inject } from "../../infra/di/Registry";
+import AccountRepository from "../../infra/repository/AccountRepository";
 
 export default class Withdraw {
-
-    constructor (readonly accountRepository: AccountRepository) {
-    }
+    @inject("accountRepository")
+        accountRepository!: AccountRepository;
 
     async execute (input: Input): Promise<void> {
         const account = await this.accountRepository.getAccount(input.accountId);

@@ -1,14 +1,19 @@
-import Signup from "../src/Signup";
-import GetAccount from "../src/GetAccount";
-import { AccountRepositoryDatabase } from "../src/AccountRepository";
+import Signup from "../src/application/usecase/Signup";
+import GetAccount from "../src/application/usecase/GetAccount";
+import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
+import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
+import Registry from "../src/infra/di/Registry";
 
 let signup: Signup;
 let getAccount: GetAccount;
+let connection: DatabaseConnection;
 
 beforeEach(() => {
-    const accountRepository = new AccountRepositoryDatabase();
-    signup = new Signup(accountRepository);
-    getAccount = new GetAccount(accountRepository);
+    connection = new PgPromiseAdapter();
+    Registry.getInstance().register("databaseConnection", connection);
+    Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    signup = new Signup();
+    getAccount = new GetAccount();
 });
 
 test("Deve criar uma conta", async () => {
@@ -25,6 +30,10 @@ test("Deve criar uma conta", async () => {
     expect(outputGetAccount.email).toBe(input.email);
     expect(outputGetAccount.document).toBe(input.document);
     expect(outputGetAccount.password).toBe(input.password);
+});
+
+afterEach(async () => {
+    await connection.close();
 });
 
 // test("Deve criar uma conta com stub", async () => {

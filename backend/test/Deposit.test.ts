@@ -1,17 +1,22 @@
-import Signup from "../src/Signup";
-import GetAccount from "../src/GetAccount";
-import Deposit from "../src/Deposit";
-import { AccountRepositoryDatabase } from "../src/AccountRepository";
+import Signup from "../src/application/usecase/Signup";
+import GetAccount from "../src/application/usecase/GetAccount";
+import Deposit from "../src/application/usecase/Deposit";
+import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
+import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
+import Registry from "../src/infra/di/Registry";
 
 let signup: Signup;
 let getAccount: GetAccount;
 let deposit: Deposit;
+let connection: DatabaseConnection;
 
 beforeEach(() => {
-    const accountRepository = new AccountRepositoryDatabase();
-    signup = new Signup(accountRepository);
-    getAccount = new GetAccount(accountRepository);
-    deposit = new Deposit(accountRepository);
+    connection = new PgPromiseAdapter();
+    Registry.getInstance().register("databaseConnection", connection);
+    Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    signup = new Signup();
+    getAccount = new GetAccount();
+    deposit = new Deposit();
 });
 
 test("Deve fazer um depósito", async () => {
@@ -53,4 +58,8 @@ test("Deve fazer dois depósitos do mesmo asset", async () => {
     expect(outputGetAccount.assets).toHaveLength(1);
     expect(outputGetAccount.assets[0].assetId).toBe("BTC");
     expect(outputGetAccount.assets[0].quantity).toBe(2);
+});
+
+afterEach(async () => {
+    await connection.close();
 });

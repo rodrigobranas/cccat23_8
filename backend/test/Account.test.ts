@@ -1,4 +1,4 @@
-import Account from "../src/Account";
+import Account from "../src/domain/Account";
 
 test("Não deve criar uma conta com nome inválido", () => {
     expect(() => Account.create("John", "john.doe@gmail.com", "97456321558", "asdQWE123")).toThrow(new Error("Invalid name"));

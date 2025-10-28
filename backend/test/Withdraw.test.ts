@@ -1,20 +1,25 @@
-import Signup from "../src/Signup";
-import GetAccount from "../src/GetAccount";
-import Deposit from "../src/Deposit";
-import Withdraw from "../src/Withdraw";
-import { AccountRepositoryDatabase } from "../src/AccountRepository";
+import Signup from "../src/application/usecase/Signup";
+import GetAccount from "../src/application/usecase/GetAccount";
+import Deposit from "../src/application/usecase/Deposit";
+import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
+import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
+import Withdraw from "../src/application/usecase/Withdraw";
+import Registry from "../src/infra/di/Registry";
 
 let signup: Signup;
 let getAccount: GetAccount;
 let deposit: Deposit;
 let withdraw: Withdraw;
+let connection: DatabaseConnection;
 
 beforeEach(() => {
-    const accountRepository = new AccountRepositoryDatabase();
-    signup = new Signup(accountRepository);
-    getAccount = new GetAccount(accountRepository);
-    deposit = new Deposit(accountRepository);
-    withdraw = new Withdraw(accountRepository);
+    connection = new PgPromiseAdapter();
+    Registry.getInstance().register("databaseConnection", connection);
+    Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    signup = new Signup();
+    getAccount = new GetAccount();
+    deposit = new Deposit();
+    withdraw = new Withdraw();
 });
 
 test("Deve fazer um saque", async () => {
@@ -63,4 +68,8 @@ test("Deve fazer um saque", async () => {
         quantity: 2
     }
     await expect(() => withdraw.execute(inputWithdraw)).rejects.toThrow(new Error("Insufficient funds"));
+});
+
+afterEach(async () => {
+    await connection.close();
 });
