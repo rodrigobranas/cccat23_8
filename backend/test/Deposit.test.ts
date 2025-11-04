@@ -4,6 +4,7 @@ import Deposit from "../src/application/usecase/Deposit";
 import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
 import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
 import Registry from "../src/infra/di/Registry";
+import { WalletRepositoryDatabase } from "../src/infra/repository/WalletRepository";
 
 let signup: Signup;
 let getAccount: GetAccount;
@@ -14,6 +15,7 @@ beforeEach(() => {
     connection = new PgPromiseAdapter();
     Registry.getInstance().register("databaseConnection", connection);
     Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    Registry.getInstance().register("walletRepository", new WalletRepositoryDatabase());
     signup = new Signup();
     getAccount = new GetAccount();
     deposit = new Deposit();

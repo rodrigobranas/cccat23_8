@@ -5,12 +5,14 @@ import { ExpressAdapter } from "./infra/http/HttpServer";
 import AccountController from "./infra/controller/AccountController";
 import { AccountRepositoryDatabase } from "./infra/repository/AccountRepository";
 import Registry from "./infra/di/Registry";
+import { WalletRepositoryDatabase } from "./infra/repository/WalletRepository";
 
 async function main () {
     const httpServer = new ExpressAdapter();
     Registry.getInstance().register("httpServer", httpServer);
     Registry.getInstance().register("databaseConnection", new PgPromiseAdapter()); 
     Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    Registry.getInstance().register("walletRepository", new WalletRepositoryDatabase());
     Registry.getInstance().register("signup", new Signup());
     Registry.getInstance().register("getAccount", new GetAccount());
     new AccountController();
