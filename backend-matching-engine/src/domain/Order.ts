@@ -29,8 +29,12 @@ export default class Order {
 
     fill (quantity: number, price: number) {
         if (this.getAvailableQuantity() < quantity) throw new Error("Insufficient quantity");
+        const previousTotalValue = this.fillPrice * this.fillQuantity;
+        const newValue = price * quantity;
+        const totalValue = previousTotalValue + newValue;
+        const totalQuantity = this.fillQuantity + quantity;
+        this.fillPrice = totalValue / totalQuantity;
         this.fillQuantity += quantity;
-        this.fillPrice = price;
         if (this.getAvailableQuantity() === 0) this.status = "closed";
     }
 

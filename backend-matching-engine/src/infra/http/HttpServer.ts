@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import * as Hapi from "@hapi/hapi";
-import * as restify from "restify";
+// import * as restify from "restify";
 
 export default interface HttpServer {
     route (method: "get" | "post", url: string, callback: Function): void;
@@ -79,45 +79,45 @@ export class HapiAdapter implements HttpServer {
     }
 }
 
-export class RestifyAdapter implements HttpServer {
-    server: restify.Server;
+// export class RestifyAdapter implements HttpServer {
+//     server: restify.Server;
 
-    constructor() {
-        this.server = restify.createServer();
-        this.server.use(restify.plugins.bodyParser());
-        this.server.use(restify.plugins.queryParser());
+//     constructor() {
+//         this.server = restify.createServer();
+//         this.server.use(restify.plugins.bodyParser());
+//         this.server.use(restify.plugins.queryParser());
         
-        // CORS setup
-        this.server.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*');
-            res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
-            res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-            if (req.method === 'OPTIONS') {
-                res.send(200);
-                return;
-            }
-            return next();
-        });
-    }
+//         // CORS setup
+//         this.server.use((req, res, next) => {
+//             res.header('Access-Control-Allow-Origin', '*');
+//             res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control');
+//             res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+//             if (req.method === 'OPTIONS') {
+//                 res.send(200);
+//                 return;
+//             }
+//             return next();
+//         });
+//     }
 
-    route(method: "get" | "post", url: string, callback: Function): void {
-        this.server[method](url.replace(/\{|\}/g, ""), async (req: restify.Request, res: restify.Response, next: restify.Next) => {
-            try {
-                const output = await callback(req.params, req.body);
-                res.json(output);
-                return next();
-            } catch (e: any) {
-                res.json(422, {
-                    message: e.message
-                });
-                return next();
-            }
-        });
-    }
+//     route(method: "get" | "post", url: string, callback: Function): void {
+//         this.server[method](url.replace(/\{|\}/g, ""), async (req: restify.Request, res: restify.Response, next: restify.Next) => {
+//             try {
+//                 const output = await callback(req.params, req.body);
+//                 res.json(output);
+//                 return next();
+//             } catch (e: any) {
+//                 res.json(422, {
+//                     message: e.message
+//                 });
+//                 return next();
+//             }
+//         });
+//     }
 
-    listen(port: number): void {
-        this.server.listen(port, () => {
-            console.log(`Restify server running on port ${port}`);
-        });
-    }
-}
+//     listen(port: number): void {
+//         this.server.listen(port, () => {
+//             console.log(`Restify server running on port ${port}`);
+//         });
+//     }
+// }

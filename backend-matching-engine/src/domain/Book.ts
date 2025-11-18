@@ -10,7 +10,6 @@ export default class Book extends Mediator {
     }
 
     async insert (order: Order) {
-        console.log(order.side, order.quantity, order.price);
         if (order.side === "buy") {
             this.buys.push(order);
             this.buys.sort((a: Order, b: Order) => b.price - a.price);
@@ -23,11 +22,10 @@ export default class Book extends Mediator {
     }
 
     async execute () {
-        console.log("execute");
-        const highestBuy = this.buys[0];
-        const lowestSell = this.sells[0];
-        if (highestBuy && lowestSell && highestBuy.price >= lowestSell.price) {
-            console.log("match");
+        while (true) {
+            const highestBuy = this.buys[0];
+            const lowestSell = this.sells[0];
+            if (!highestBuy || !lowestSell || highestBuy.price < lowestSell.price) break;
             const fillQuantity = Math.min(highestBuy.getAvailableQuantity(), lowestSell.getAvailableQuantity());
             const fillPrice = (highestBuy.timestamp.getTime() > lowestSell.timestamp.getTime()) ? lowestSell.price : highestBuy.price;
             highestBuy.fill(fillQuantity, fillPrice);
@@ -36,9 +34,7 @@ export default class Book extends Mediator {
             if (lowestSell.getStatus() === "closed") this.sells.splice(this.sells.indexOf(lowestSell), 1);
             await this.notifyAll("orderFilled", { orderId: highestBuy.getOrderId(), quantity: fillQuantity, price: fillPrice });
             await this.notifyAll("orderFilled", { orderId: lowestSell.getOrderId(), quantity: fillQuantity, price: fillPrice });
-            console.log("end");
-        } else {
-            console.log("no match");
         }
+        
     }
 }

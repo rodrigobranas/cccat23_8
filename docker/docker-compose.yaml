@@ -9,3 +9,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: app
+  queue:
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672

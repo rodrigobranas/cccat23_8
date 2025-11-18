@@ -7,6 +7,7 @@ export default class ExecuteOrder {
     orderRepository!: OrderRepository;
 
     async execute (marketId: string): Promise<void> {
+        console.log("executeOrder");
         const orders = await this.orderRepository.getOrdersByMarketIdAndStatus(marketId, "open");
         const highestBuy = orders.filter((order: Order) => order.side === "buy").sort((a: Order, b: Order) => b.price - a.price)[0];
         const lowestSell = orders.filter((order: Order) => order.side === "sell").sort((a: Order, b: Order) => a.price - b.price)[0];
