@@ -33,8 +33,7 @@ async function main () {
             quantity: 1 + Math.floor(Math.random() * 5),
             price: 85 + ((Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 10))
         }
-        await axios.post("http://localhost:3000/place_order", inputOrder);
-        await sleep(100);
+        await axios.post("http://localhost:3000/place_order_async", inputOrder);
     }
     
 }

@@ -14,6 +14,7 @@ export class RabbitMQAdapter implements Queue {
     async connect(): Promise<void> {
         this.connection = await amqp.connect("amqp://localhost");
         this.channel = await this.connection.createChannel();
+        this.channel.prefetch(1);
     }
 
     async consume(event: string, callback: Function): Promise<void> {

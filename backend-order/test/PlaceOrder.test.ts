@@ -151,7 +151,7 @@ test("Não deve fazer uma ordem de venda sem saldo", async () => {
     await expect(() => placeOrder.execute(inputPlaceOrder)).rejects.toThrow(new Error("Insufficient funds"));
 });
 
-test("Deve fazer uma ordem de compra e uma ordem de venda", async () => {
+test("Deve fazer uma ordem de compra e uma ordem de venda A", async () => {
     const marketId = `BTC-USD-${Math.random()}`;
     const outputSignup = await accountGateway.signup({
         name: "John Doe",
@@ -176,6 +176,7 @@ test("Deve fazer uma ordem de compra e uma ordem de venda", async () => {
         quantity: 1,
         price: 85000
     });
+    await sleep(200);
     const outputPlaceOrder2 = await placeOrder.execute({
         accountId: outputSignup.accountId,
         marketId,
@@ -183,8 +184,8 @@ test("Deve fazer uma ordem de compra e uma ordem de venda", async () => {
         quantity: 1,
         price: 83000
     });
+    await sleep(200);
     const outputGetOrder1 = await getOrder.execute(outputPlaceOrder1.orderId);
-    await sleep(10);
     const outputGetOrder2 = await getOrder.execute(outputPlaceOrder2.orderId);
     expect(outputGetOrder1.fillQuantity).toBe(1);
     expect(outputGetOrder1.fillPrice).toBe(85000);
@@ -194,7 +195,7 @@ test("Deve fazer uma ordem de compra e uma ordem de venda", async () => {
     expect(outputGetOrder2.status).toBe("closed");
 });
 
-test.only("Deve fazer uma ordem de venda e uma ordem de compra", async () => {
+test("Deve fazer uma ordem de venda e uma ordem de compra B", async () => {
     const outputSignup = await accountGateway.signup({
         name: "John Doe",
         email: "john.doe@gmail.com",

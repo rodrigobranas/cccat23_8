@@ -1,7 +1,11 @@
+import CreateOrderProjection from "../../application/usecase/CreateOrderProjection";
 import Deposit from "../../application/usecase/Deposit";
 import ExecuteOrder from "../../application/usecase/ExecuteOrder";
 import FillOrder from "../../application/usecase/FillOrder";
+import GetOrder from "../../application/usecase/GetOrder";
+import GetOrders from "../../application/usecase/GetOrders";
 import PlaceOrder from "../../application/usecase/PlaceOrder";
+import UpdateOrderProjection from "../../application/usecase/UpdateOrderProjection";
 import Order from "../../domain/Order";
 import { inject } from "../di/Registry";
 import BookGateway from "../gateway/BookGateway";
@@ -19,6 +23,14 @@ export default class OrderController {
     placeOrder!: PlaceOrder;
     @inject("executeOrder")
     executeOrder!: ExecuteOrder;
+    @inject("getOrder")
+    getOrder!: GetOrder;
+    @inject("getOrders")
+    getOrders!: GetOrders;
+    @inject("createOrderProjection")
+    createOrderProjection!: CreateOrderProjection;
+    @inject("updateOrderProjection")
+    updateOrderProjection!: UpdateOrderProjection;
     @inject("bookGateway")
     bookGateway!: BookGateway;
     @inject("httpServer")
@@ -31,7 +43,16 @@ export default class OrderController {
     constructor () {
         this.httpServer.route("post", "/place_order", async (params: any, body: any) => {
             const input = body;
-            await this.placeOrder.execute(input);
+            const output = await this.placeOrder.execute(input);
+            return output;
+        });
+        this.httpServer.route("get", "/orders/:{orderId}", async (params: any, body: any) => {
+            const output = await this.getOrder.execute(params.orderId);
+            return output;
+        });
+        this.httpServer.route("get", "/orders", async (params: any, body: any) => {
+            const output = await this.getOrders.execute(params.orderId);
+            return output;
         });
         this.httpServer.route("post", "/deposit", async (params: any, body: any) => {
             const input = body;
@@ -61,6 +82,26 @@ export default class OrderController {
         this.queue.consume("orderFilled.fillOrder", async (body: any) => {
             console.log("fillOrder");
             await this.fillOrder.execute(body);
+        });
+        // command
+        this.httpServer.route("post", "/place_order_async", async (params: any, body: any) => {
+            const input = body;
+            await this.queue.publish("placeOrder", input);
+        });
+        // handler
+        this.queue.consume("placeOrder.placeOrder", async (body: any) => {
+            console.log("placeOrder", new Date());
+            const input = body;
+            await this.placeOrder.execute(input);
+        });
+        this.queue.consume("orderPlaced.createOrderProjection", async (body: any) => {
+            console.log("createOrderProjection");
+            await this.createOrderProjection.execute(body);
+        });
+        this.queue.consume("orderFilled.updateOrderProjection", async (body: any) => {
+            console.log("updateOrderProjection");
+            console.log(body);
+            await this.updateOrderProjection.execute(body);
         });
     }
 

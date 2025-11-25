@@ -6,6 +6,7 @@ export default interface OrderRepository {
     saveOrder (order: Order): Promise<void>;
     updateOrder (order: Order): Promise<void>;
     getOrder (orderId: string): Promise<Order>;
+    getOrders (): Promise<Order[]>;
     getOrdersByMarketIdAndStatus (marketId: string, status: string): Promise<Order[]>;
 }
 
@@ -25,6 +26,16 @@ export class OrderRepositoryDatabase implements OrderRepository {
         const [orderData] = await this.connection.query("select * from ccca.order where order_id = $1", [orderId]);
         if (!orderData) throw new Error("Order not found");
         return new Order(orderData.order_id, orderData.account_id, orderData.market_id, orderData.side, parseFloat(orderData.quantity), parseFloat(orderData.price), orderData.status, orderData.timestamp, parseFloat(orderData.fill_quantity), parseFloat(orderData.fill_price));
+    }
+
+    async getOrders(): Promise<Order[]> {
+        const ordersData = await this.connection.query("select * from ccca.order limit 1000", []);
+        const orders = [];
+        for (const orderData of ordersData) {
+            const order = new Order(orderData.order_id, orderData.account_id, orderData.market_id, orderData.side, parseFloat(orderData.quantity), parseFloat(orderData.price), orderData.status, orderData.timestamp, parseFloat(orderData.fill_quantity), parseFloat(orderData.fill_price));
+            orders.push(order);
+        }
+        return orders;
     }
 
     async getOrdersByMarketIdAndStatus(marketId: string, status: string): Promise<Order[]> {

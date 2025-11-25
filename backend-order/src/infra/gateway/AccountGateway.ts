@@ -2,6 +2,7 @@ import axios from "axios";
 
 export default interface AccountGateway {
     signup (input: SignupInput): Promise<SignupOutput>
+    getAccount (accountId: string): Promise<any>;
 }
 
 type SignupInput = {
@@ -23,4 +24,9 @@ export class AccountGatewayHttp implements AccountGateway {
         return output;
     }
 
+    async getAccount(accountId: string): Promise<any> {
+        const response = await axios.get(`http://localhost:3002/accounts/${accountId}`);
+        const output = response.data;
+        return output;
+    }
 }

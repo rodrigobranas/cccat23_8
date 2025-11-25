@@ -31,3 +31,28 @@ create table ccca.order (
 	timestamp timestamptz,
 	primary key (order_id)
 );
+
+create table ccca.message (
+	message_id uuid,
+	event text,
+	data jsonb,
+	status text,
+	timestamp timestamptz,
+	primary key (message_id)
+);
+
+create table ccca.order_projection (
+	order_id uuid,
+	market_id text,
+	account_id uuid,
+	name text,
+	email text,
+	side text,
+	quantity numeric,
+	price numeric,
+	fill_quantity numeric,
+	fill_price numeric,
+	status text,
+	timestamp timestamptz,
+	primary key (order_id)
+);
