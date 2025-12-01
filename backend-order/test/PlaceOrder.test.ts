@@ -49,6 +49,7 @@ beforeEach(() => {
     });
     Registry.getInstance().register("mediator", mediator);
     accountGateway = new AccountGatewayHttp();
+    Registry.getInstance().register("accountGateway", accountGateway);
     deposit = new Deposit();
     placeOrder = new PlaceOrder();
     getOrder = new GetOrder();

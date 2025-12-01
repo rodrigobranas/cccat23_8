@@ -3,6 +3,7 @@ import GetAccount from "../src/application/usecase/GetAccount";
 import DatabaseConnection, { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
 import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
 import Registry from "../src/infra/di/Registry";
+import { AccountDAODatabase } from "../src/infra/dao/AccountDAO";
 
 let signup: Signup;
 let getAccount: GetAccount;
@@ -12,6 +13,7 @@ beforeEach(() => {
     connection = new PgPromiseAdapter();
     Registry.getInstance().register("databaseConnection", connection);
     Registry.getInstance().register("accountRepository", new AccountRepositoryDatabase());
+    Registry.getInstance().register("accountDAO", new AccountDAODatabase());
     signup = new Signup();
     getAccount = new GetAccount();
 });
